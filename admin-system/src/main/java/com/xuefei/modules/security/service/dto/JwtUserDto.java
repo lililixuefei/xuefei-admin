@@ -1,12 +1,14 @@
-package com.xuefei.modules.service.dto;
+package com.xuefei.modules.security.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.xuefei.modules.system.service.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,19 +18,25 @@ import java.util.stream.Collectors;
  * @author: xuefei
  * @date: 2021/01/05 23:38
  */
+@Setter
 @Getter
 @AllArgsConstructor
 public class JwtUserDto implements UserDetails {
 
     private final UserDto user;
 
-    private final List<Long> dataScopes;
+//    private final List<Long> dataScopes;
 
-    @JsonIgnore
-    private final List<GrantedAuthority> authorities;
+//    @JsonIgnore
+//    private final List<GrantedAuthority> authorities;
 
-    public Set<String> getRoles() {
-        return authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
+//    public Set<String> getRoles() {
+//        return authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
+//    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
     }
 
     @Override

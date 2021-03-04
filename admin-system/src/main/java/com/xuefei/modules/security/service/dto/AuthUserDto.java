@@ -1,4 +1,4 @@
-package com.xuefei.modules.service.dto;
+package com.xuefei.modules.security.service.dto;
 
 
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.Setter;
 import javax.validation.constraints.NotBlank;
 
 /**
- * @description:
+ * @description: 用户登录数据传输对象
  * @author: xuefei
  * @date: 2020/12/04 13:07
  */

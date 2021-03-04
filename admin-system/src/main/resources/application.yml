@@ -15,6 +15,12 @@ spring:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     open-in-view: true
 
+  redis:
+    database: ${REDIS_DB:0}
+    host: ${REDIS_DB:47.101.156.32}
+    port: ${REDIS_DB:6379}
+    timeout: 5000
+
 
 #密码加密传输，前端公钥加密，后端私钥解密
 rsa:

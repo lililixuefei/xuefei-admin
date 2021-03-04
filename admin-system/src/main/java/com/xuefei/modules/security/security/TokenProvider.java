@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @description:
+ * @description: TokenProvider
  * @author: xuefei
  * @date: 2021/01/06 00:01
  */

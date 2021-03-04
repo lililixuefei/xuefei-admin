@@ -8,8 +8,9 @@ import com.xuefei.modules.security.config.bean.LoginCodeEnum;
 import com.xuefei.modules.security.config.bean.LoginProperties;
 import com.xuefei.modules.security.config.bean.SecurityProperties;
 import com.xuefei.modules.security.security.TokenProvider;
-import com.xuefei.modules.service.OnlineUserService;
-import com.xuefei.modules.service.dto.AuthUserDto;
+import com.xuefei.modules.security.service.OnlineUserService;
+import com.xuefei.modules.security.service.dto.AuthUserDto;
+import com.xuefei.modules.security.service.dto.JwtUserDto;
 import com.xuefei.utils.RedisUtils;
 import com.xuefei.utils.RsaUtils;
 import io.swagger.annotations.ApiOperation;
@@ -18,6 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +47,8 @@ public class AuthorizationController {
     private final OnlineUserService onlineUserService;
     private final TokenProvider tokenProvider;
 
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+
     private final RedisUtils redisUtils;
 
     @Resource
@@ -61,7 +68,25 @@ public class AuthorizationController {
         if (StringUtils.isBlank(authUser.getCode()) || !authUser.getCode().equalsIgnoreCase(code)) {
             throw new BadRequestException("验证码错误");
         }
-        return ResponseEntity.ok("authInfo");
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(authUser.getUsername(), password);
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // 生成令牌
+        String token = tokenProvider.createToken(authentication);
+        final JwtUserDto jwtUserDto = (JwtUserDto) authentication.getPrincipal();
+        // 保存在线信息
+        onlineUserService.save(jwtUserDto, token, request);
+        // 返回 token 与 用户信息
+        Map<String, Object> authInfo = new HashMap<String, Object>(2) {{
+            put("token", properties.getTokenStartWith() + token);
+            put("user", jwtUserDto);
+        }};
+        if (loginProperties.isSingleLogin()) {
+            //踢掉之前已经登录的token
+            onlineUserService.checkLoginOnUser(authUser.getUsername(), token);
+        }
+        return ResponseEntity.ok(authInfo);
     }
 
     @ApiOperation("获取用户信息")

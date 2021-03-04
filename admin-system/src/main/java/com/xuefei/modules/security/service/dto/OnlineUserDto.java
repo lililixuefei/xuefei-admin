@@ -1,4 +1,4 @@
-package com.xuefei.modules.service.dto;
+package com.xuefei.modules.security.service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
