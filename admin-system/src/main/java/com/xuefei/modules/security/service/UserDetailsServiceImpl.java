@@ -4,6 +4,8 @@ import com.xuefei.exception.BadRequestException;
 import com.xuefei.exception.EntityNotFoundException;
 import com.xuefei.modules.security.config.bean.LoginProperties;
 import com.xuefei.modules.security.service.dto.JwtUserDto;
+import com.xuefei.modules.system.service.DataService;
+import com.xuefei.modules.system.service.RoleService;
 import com.xuefei.modules.system.service.UserService;
 import com.xuefei.modules.system.service.dto.UserDto;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +25,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 @Service("userDetailsService")
 public class UserDetailsServiceImpl implements UserDetailsService {
+
     private final UserService userService;
     private final LoginProperties loginProperties;
+    private final RoleService roleService;
+    private final DataService dataService;
 
     public void setEnableCache(boolean enableCache) {
         this.loginProperties.setCacheEnable(enableCache);
@@ -47,7 +52,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             UserDto user;
             try {
                 user = userService.findByName(username);
-                System.out.println(Objects.isNull(user));
             } catch (EntityNotFoundException e) {
                 // SpringSecurity会自动转换UsernameNotFoundException为BadCredentialsException
                 throw new UsernameNotFoundException("", e);
@@ -59,7 +63,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     throw new BadRequestException("账号未激活！");
                 }
                 jwtUserDto = new JwtUserDto(
-                        user
+                        user,
+                        dataService.getDeptIds(user),
+                        roleService.mapToGrantedAuthorities(user)
                 );
                 userDtoCache.put(username, jwtUserDto);
             }

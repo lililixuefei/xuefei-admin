@@ -25,14 +25,14 @@ public class JwtUserDto implements UserDetails {
 
     private final UserDto user;
 
-//    private final List<Long> dataScopes;
+    private final List<Long> dataScopes;
 
-//    @JsonIgnore
-//    private final List<GrantedAuthority> authorities;
+    @JsonIgnore
+    private final List<GrantedAuthority> authorities;
 
-//    public Set<String> getRoles() {
-//        return authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
-//    }
+    public Set<String> getRoles() {
+        return authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

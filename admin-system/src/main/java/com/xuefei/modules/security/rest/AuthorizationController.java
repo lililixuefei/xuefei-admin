@@ -13,6 +13,7 @@ import com.xuefei.modules.security.service.dto.AuthUserDto;
 import com.xuefei.modules.security.service.dto.JwtUserDto;
 import com.xuefei.utils.RedisUtils;
 import com.xuefei.utils.RsaUtils;
+import com.xuefei.utils.SecurityUtils;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -92,11 +93,13 @@ public class AuthorizationController {
     @ApiOperation("获取用户信息")
     @GetMapping(value = "/info")
     public ResponseEntity<Object> getUserInfo() {
-        return ResponseEntity.ok("SecurityUtils.getCurrentUser()");
+        System.out.println(SecurityUtils.getCurrentUser().toString());
+        return ResponseEntity.ok(SecurityUtils.getCurrentUser());
     }
 
+
     @RequestMapping(path = "/code")
-    public ResponseEntity<Object> getCode(){
+    public ResponseEntity<Object> getCode() {
         // 获取运算的结果
         Captcha captcha = loginProperties.getCaptcha();
         String uuid = properties.getCodeKey() + IdUtil.simpleUUID();
@@ -116,6 +119,7 @@ public class AuthorizationController {
     }
 
     @ApiOperation("退出登录")
+    @DeleteMapping("/logout")
     public ResponseEntity<Object> logout(HttpServletRequest request) {
         onlineUserService.logout(tokenProvider.getToken(request));
         return new ResponseEntity<>(HttpStatus.OK);
